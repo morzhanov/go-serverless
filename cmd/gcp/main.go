@@ -1,10 +1,22 @@
-package main
+// Package p contains an HTTP Cloud Function.
+package p
 
-import "github.com/morzhanov/go-serverless/internal"
+import (
+	"encoding/json"
+	"fmt"
+	"html"
+	"net/http"
 
-func main() {
-	s := internal.NewService()
+	"github.com/morzhanov/go-serverless/internal"
+)
 
-	// TODO: setup handler
-	// TODO: call s.Handle in the function handler
+var s = internal.NewService()
+
+func Handle(w http.ResponseWriter, r *http.Request) {
+	var d internal.Event
+	if err := json.NewDecoder(r.Body).Decode(&d); err != nil {
+		b, _ := json.Marshal(&d)
+		s.Handle(b)
+	}
+	fmt.Fprint(w, html.EscapeString(d.Name))
 }
